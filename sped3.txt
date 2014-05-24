@@ -1,0 +1,109 @@
+
+
+
+                                      .!.
+                                     !!!!!. 
+                                  .   '!!!!!. 
+                                .!!!.   '!!!!!.
+                              .!!!!!!!.   '!!!!!.
+                            .!!!!!!!!!'   .!!!!!!!.
+                            '!!!!!!!'   .!!!!!!!!!'
+                              '!!!!!.   '!!!!!!!' 
+                                '!!!!!.   '!!!'
+                                  '!!!!!.   '
+                                    '!!!!! 
+                                      '!'   
+
+
+                          M A C K A P A R    M E D I A                          
+
+
+
+
+
+
+    .---------------------.
+----! DCPU-16 INFORMATION !----------------------------------------------------- 
+    '---------------------' 
+
+Name: Mackapar Suspended Particle Exciter Display, Rev 3 (SPED-3) 
+ID: 0x42babf3c, version: 0x0003
+Manufactorer: 0x1eb37e91 (MACKAPAR)
+
+
+
+    .-------------.
+----! DESCRIPTION !------------------------------------------------------------- 
+    '-------------'
+
+The Mackapar Suspended Particle Exciter Display, Rev 3 ("the device") is a 3D
+vector display unit. Straight lines are drawn between consecutive vertices in a
+constant loop, with customizable colors per vertex. The effect is similar to a
+free floating 3D model.
+The area of the projected model is about 1x1x1 meters, and projection occurs
+1.5 meters above the device.
+The emitters are capable to rotate around the Z axis at 50 degrees per second,
+allowing for easy animation of projected models.
+Up to 128 lines may be projected, but the more lines are projected, the more
+severe the flickering gets.  
+
+
+
+    .--------------------.
+----! INTERRUPT BEHAVIOR !------------------------------------------------------
+    '--------------------'
+    
+A, B, C, X, Y, Z, I, J below refer to the registers on the DCPU
+    
+A: Behavior:
+
+0  Poll device. Sets B to the current state (see below) and C to the last error
+   since the last device poll.
+   
+1  Map region. Sets the memory map offset to X, and the total number of vertices
+   to render to Y. See below for the encoding information.
+
+2  Rotate device. Sets the target rotation for the device to X%360 degrees.
+
+
+
+    .-----------------.
+----! VERTEX ENCODING !---------------------------------------------------------
+    '-----------------'
+  
+Each vertex occupies two words of information in the main DCPU RAM. The data is
+encoded as (in LSB-0 format):
+ First word: YYYYYYYYXXXXXXXX
+Second word: 00000ICCYYYYYYYY
+Where XXXXXXXX is the X-coordinate of the vertex, YYYYYYYY is the Y-coordinate, 
+ZZZZZZZZ is the Z-coordinate, CC is color, and I is intensity.
+Z is deeper into the screen, if the device is placed face up on the ground, this
+translates to "up" relative to the user.
+Possible color values are 0: black, 1: red, 2: green, 3: blue.
+If the intensity bit is set, the color is drawn as more intense.
+The black color is meant to barely be visible at all, except for in very dim
+environments, or if the intensity bit is set. 
+
+
+
+    .-------------.
+----! STATE CODES !-------------------------------------------------------------
+    '-------------'
+  
+0x0000 STATE_NO_DATA    No vertices queued up, device is in stand-by   
+0x0001 STATE_RUNNING    The device is projecting lines
+0x0002 STATE_TURNING    The device is projecting lines and turning
+
+
+
+    .-------------.
+----! ERROR CODES !-------------------------------------------------------------
+    '-------------'
+    
+0x0000 ERROR_NONE       There's been no error since the last poll.
+0xffff ERROR_BROKEN     There's been some major software or hardware problem,
+                        try turning off and turning on the device again.
+
+
+
+   COPYRIGHT 1988 MACKAPAR MEDIA    ALL RIGHTS RESERVED    DO NOT DISTRIBUTE
